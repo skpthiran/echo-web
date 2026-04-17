@@ -1,0 +1,6 @@
+Database password - sMlqdJFwhcgNomF7
+anon key - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxbXpieG55dXl1cWlyeHNseXdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDU1OTYsImV4cCI6MjA5MTk4MTU5Nn0.KxSTpHKywCawuBJgwLG3j9V_0uGfcu_uOJEBADVEuRA
+url - https://supabase.com/dashboard/project/kqmzbxnyuyuqirxslywb
+
+groq - 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
+gemini - AQ.Ab8RN6Iv0MQvfeCP2kSLzWgezHWIDANq2_5_9Fa-Jat_77QpZA

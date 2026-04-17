@@ -1,0 +1,40 @@
+/**
+ * Groq AI Client for high-speed text inference.
+ */
+
+const GROQ_API_KEY = import.meta.env.VITE_GROQ_API_KEY;
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+export async function groqGenerate(prompt: string, maxTokens: number = 500): Promise<string> {
+  if (!GROQ_API_KEY) {
+    console.error('Groq API key missing');
+    return '';
+  }
+
+  try {
+    const response = await fetch(GROQ_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GROQ_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: maxTokens,
+        temperature: 0.1,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json() as any;
+      throw new Error(`Groq API error: ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json() as any;
+    return data.choices[0]?.message?.content?.trim() ?? '';
+  } catch (error) {
+    console.error('Groq generation failed:', error);
+    return '';
+  }
+}
