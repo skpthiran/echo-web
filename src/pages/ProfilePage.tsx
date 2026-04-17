@@ -19,6 +19,7 @@ export function ProfilePage() {
   const [avatarUrl, setAvatarUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   // Posts state
@@ -89,6 +90,7 @@ export function ProfilePage() {
         .getPublicUrl(filePath);
 
       setAvatarUrl(data.publicUrl);
+      setImgError(false); // Reset error state on new upload
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -156,15 +158,22 @@ export function ProfilePage() {
             <motion.div 
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-32 h-32 rounded-full overflow-hidden border border-[rgba(255,255,255,0.1)] shadow-[0_0_40px_rgba(255,255,255,0.05)] bg-[#0a0b12]"
+              className="w-32 h-32 rounded-full overflow-hidden border border-[rgba(255,255,255,0.1)] shadow-[0_0_40px_rgba(255,255,255,0.05)] bg-[#14151a] flex items-center justify-center"
             >
-              <img 
-                src={avatarUrl || `https://api.dicebear.com/7.x/shapes/svg?seed=${user?.id}`} 
-                alt="Me" 
-                className={`w-full h-full object-cover ${uploading ? 'opacity-30' : ''}`}
-              />
+              {avatarUrl && !imgError ? (
+                <img 
+                  src={avatarUrl} 
+                  alt={profile?.username || 'User'} 
+                  onError={() => setImgError(true)}
+                  className={`w-full h-full object-cover ${uploading ? 'opacity-30' : ''}`}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-white/5 text-[#e1e3ed]/40 text-4xl font-serif">
+                  {profile?.username?.charAt(0).toUpperCase() ?? '?'}
+                </div>
+              )}
               {uploading && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                   <Loader2 className="w-8 h-8 text-white animate-spin" />
                 </div>
               )}
