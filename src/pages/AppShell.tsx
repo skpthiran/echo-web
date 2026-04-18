@@ -34,10 +34,18 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
 
   React.useEffect(() => {
     // Only redirect if profile is loaded, not completed, and we aren't already on onboarding
-    if (!profileLoading && profile && !profile.onboarding_complete && location.pathname !== '/onboarding') {
+    if (!profileLoading && profile && profile.onboarding_complete === false && location.pathname !== '/onboarding') {
       navigate('/onboarding');
     }
   }, [profile, profileLoading, navigate, location.pathname]);
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-[#050508] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#8e84ad]/20 border-t-[#8e84ad] rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },

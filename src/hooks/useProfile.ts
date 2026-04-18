@@ -19,6 +19,7 @@ export function useProfile() {
 
   const fetchProfile = async () => {
     if (!user) { setLoading(false); return }
+    setLoading(true)
     const { data } = await supabase
       .from('profiles')
       .select('*')
