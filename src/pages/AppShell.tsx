@@ -22,6 +22,7 @@ import { PostDetailPage } from './PostDetailPage';
 import { MobileHeader } from '../components/MobileHeader';
 import { BottomNav } from '../components/BottomNav';
 import { SearchPage } from './SearchPage';
+import { InstallPrompt } from '../components/InstallPrompt';
 
 export type PageId = 'home' | 'write' | 'feed' | 'resonance' | 'matches' | 'reflections' | 'chat' | 'profile' | 'settings';
 
@@ -181,6 +182,7 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
         </div>
       </main>
 
+      <InstallPrompt />
       <BottomNav />
     </div>
   );
