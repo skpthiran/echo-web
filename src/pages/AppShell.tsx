@@ -21,6 +21,7 @@ import { SettingsPage } from './SettingsPage';
 import { PostDetailPage } from './PostDetailPage';
 import { MobileHeader } from '../components/MobileHeader';
 import { BottomNav } from '../components/BottomNav';
+import { SearchPage } from './SearchPage';
 
 export type PageId = 'home' | 'write' | 'feed' | 'resonance' | 'matches' | 'reflections' | 'chat' | 'profile' | 'settings';
 
@@ -117,6 +118,8 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
               type="text" 
               placeholder="Search thoughts, feelings, patterns..." 
               className="bg-transparent border-none outline-none text-sm text-[#e1e3ed] placeholder:text-[#e1e3ed]/30 w-full"
+              onFocus={() => navigate('/search')}
+              onChange={(e) => navigate(`/search?q=${e.target.value}`)}
             />
           </div>
 
@@ -169,6 +172,7 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
                 <Route path="/reflections" element={<ReflectionsPage />} />
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/search" element={<SearchPage />} />
                 <Route path="/settings" element={<SettingsPage onLogout={signOut} />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
