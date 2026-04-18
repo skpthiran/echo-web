@@ -23,8 +23,8 @@ import { MobileHeader } from '../components/MobileHeader';
 import { BottomNav } from '../components/BottomNav';
 import { SearchPage } from './SearchPage';
 import { InstallPrompt } from '../components/InstallPrompt';
-import { useNotifications } from '../hooks/useNotifications';
-import { NotificationPanel } from '../components/NotificationPanel';
+// import { useNotifications } from '../hooks/useNotifications';
+// import { NotificationPanel } from '../components/NotificationPanel';
 
 export type PageId = 'home' | 'write' | 'feed' | 'resonance' | 'matches' | 'reflections' | 'chat' | 'profile' | 'settings';
 
@@ -33,8 +33,8 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { profile, loading: profileLoading } = useProfile();
-  const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
-  const [showNotifications, setShowNotifications] = React.useState(false);
+  // const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
+  // const [showNotifications, setShowNotifications] = React.useState(false);
 
   React.useEffect(() => {
     // Only redirect if profile is loaded, not completed, and we aren't already on onboarding
@@ -157,25 +157,11 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
 
             <div className="relative">
               <button 
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                disabled
+                className="relative w-10 h-10 rounded-full flex items-center justify-center text-[#e1e3ed]/40 cursor-not-allowed"
               >
-                <Bell className="w-5 h-5 text-[#e1e3ed]/70" />
-                {(unreadCount ?? 0) > 0 && (
-                  <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-purple-600 rounded-full border border-[#050508] shadow-[0_0_10px_rgba(142,132,173,0.5)]" />
-                )}
+                <Bell className="w-5 h-5" />
               </button>
-
-              <AnimatePresence>
-                {showNotifications && (
-                  <NotificationPanel 
-                    notifications={notifications}
-                    onMarkRead={markRead}
-                    onMarkAllRead={markAllRead}
-                    onClose={() => setShowNotifications(false)}
-                  />
-                )}
-              </AnimatePresence>
             </div>
 
             <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full overflow-hidden border border-[rgba(255,255,255,0.1)] transition-transform hover:scale-105">

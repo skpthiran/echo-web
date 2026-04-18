@@ -2,15 +2,15 @@ import React from 'react'
 import { Bell, Search, PenLine } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
-import { useNotifications } from '../hooks/useNotifications'
-import { NotificationPanel } from './NotificationPanel'
+// import { useNotifications } from '../hooks/useNotifications'
+// import { NotificationPanel } from './NotificationPanel'
 import { AnimatePresence } from 'motion/react'
 
 export const MobileHeader: React.FC = () => {
   const { user, profile } = useAuth()
   const navigate = useNavigate()
-  const { notifications, unreadCount, markRead, markAllRead } = useNotifications()
-  const [showNotifications, setShowNotifications] = React.useState(false)
+  // const { notifications, unreadCount, markRead, markAllRead } = useNotifications()
+  // const [showNotifications, setShowNotifications] = React.useState(false)
 
   return (
     <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/5 z-50 px-6 flex items-center justify-between">
@@ -38,27 +38,11 @@ export const MobileHeader: React.FC = () => {
 
         <div className="relative">
           <button 
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-2 text-white/60 hover:text-white transition-colors"
+            disabled
+            className="relative p-2 text-white/20 cursor-not-allowed"
           >
             <Bell className="w-5 h-5" />
-            {(unreadCount ?? 0) > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-purple-600 rounded-full border border-[#0a0a0a]" />
-            )}
           </button>
-          
-          <AnimatePresence>
-            {showNotifications && (
-              <div className="fixed top-16 right-4 z-50">
-                <NotificationPanel 
-                  notifications={notifications}
-                  onMarkRead={markRead}
-                  onMarkAllRead={markAllRead}
-                  onClose={() => setShowNotifications(false)}
-                />
-              </div>
-            )}
-          </AnimatePresence>
         </div>
         
         <button 
