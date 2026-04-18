@@ -43,12 +43,18 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onReactionUpdate, isDe
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full border border-[rgba(255,255,255,0.1)] overflow-hidden bg-gradient-to-br from-[#1a1b23] to-[#0a0a0f]">
-              <img 
-                src={post.profiles.avatar_url || `https://api.dicebear.com/7.x/shapes/svg?seed=${post.user_id}`} 
-                alt={post.profiles.username}
-                className="w-full h-full object-cover"
-              />
+            <div className="w-10 h-10 rounded-full border border-[rgba(255,255,255,0.1)] overflow-hidden bg-gradient-to-br from-[#1a1b23] to-[#0a0a0f] flex items-center justify-center">
+              {post.profiles.avatar_url ? (
+                <img 
+                  src={post.profiles.avatar_url} 
+                  onError={(e) => { e.currentTarget.style.display='none'; }} 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <div className="w-full h-full bg-purple-600 flex items-center justify-center text-white text-xs font-medium">
+                  {(post.profiles.username || post.user_id).charAt(0).toUpperCase()}
+                </div>
+              )}
             </div>
             <div>
               <h4 className="text-sm font-medium text-white/90 font-serif tracking-wide">{post.profiles.username}</h4>

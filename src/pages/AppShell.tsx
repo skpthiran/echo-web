@@ -157,12 +157,17 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
             </button>
 
             <button onClick={() => navigate('/profile')} className="w-9 h-9 rounded-full overflow-hidden border border-[rgba(255,255,255,0.1)] transition-transform hover:scale-105">
-              <img 
-                src={profile?.avatar_url || 'https://api.dicebear.com/7.x/shapes/svg?seed=default'} 
-                alt="Profile" 
-                className="w-full h-full object-cover" 
-                referrerPolicy="no-referrer" 
-              />
+              {profile?.avatar_url ? (
+                <img 
+                  src={profile.avatar_url} 
+                  onError={(e) => { e.currentTarget.style.display='none'; }} 
+                  className="w-full h-full object-cover" 
+                />
+              ) : (
+                <div className="w-full h-full bg-purple-600 flex items-center justify-center text-white text-sm font-medium">
+                  {profile?.username?.charAt(0).toUpperCase() ?? '?'}
+                </div>
+              )}
             </button>
           </div>
         </header>

@@ -31,9 +31,13 @@ export const MobileHeader: React.FC = () => {
         
         <Link to="/profile" className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center">
           {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+            <img 
+              src={profile.avatar_url} 
+              onError={(e) => { e.currentTarget.style.display='none'; }} 
+              className="w-full h-full object-cover" 
+            />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+            <div className="w-full h-full bg-purple-600 flex items-center justify-center text-white text-xs font-medium">
               {profile?.username?.charAt(0).toUpperCase() ?? '?'}
             </div>
           )}
