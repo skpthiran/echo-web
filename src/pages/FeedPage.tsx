@@ -12,15 +12,15 @@ export function FeedPage() {
   const { resonanceMatches, isComputing, computeResonance, fheReady } = useResonance(user?.id);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 pb-32">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-12 pb-32">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
         {/* Main Feed */}
         <div className="lg:col-span-8">
-          <div className="mb-12">
-            <h1 className="font-serif text-4xl md:text-5xl font-light tracking-tight text-white mb-4">
+          <div className="mb-8 md:mb-12">
+            <h1 className="font-serif text-3xl md:text-5xl font-light tracking-tight text-white mb-4">
               The Social Feed
             </h1>
-            <p className="text-white/40 text-sm font-light tracking-wide max-w-lg leading-relaxed">
+            <p className="text-white/40 text-xs md:text-sm font-light tracking-wide max-w-lg leading-relaxed">
               Echoes from around the world. Every thought is a thread in the collective consciousness.
             </p>
           </div>
@@ -70,8 +70,8 @@ export function FeedPage() {
           </AnimatePresence>
         </div>
 
-        {/* Resonance Sidebar */}
-        <div className="lg:col-span-4 space-y-6">
+        {/* Resonance Sidebar - Hidden on mobile */}
+        <div className="hidden lg:block lg:col-span-4 space-y-6">
           <div className="sticky top-24">
             <ResonancePanel 
               isComputing={isComputing}

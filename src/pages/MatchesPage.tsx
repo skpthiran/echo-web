@@ -76,14 +76,13 @@ export function MatchesPage({ onNavigate }: { onNavigate: (page: PageId, params?
   }, [user]);
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
-      <div className="w-full max-w-5xl mx-auto px-6 py-12">
-        <header className="mb-12">
-          <h1 className="font-serif text-4xl md:text-5xl font-light text-white mb-4">Aligned Souls</h1>
-          <p className="text-[#e1e3ed]/50 text-sm font-light max-w-lg">
-            These are individuals whose emotional wavelength matches yours based on your most recent thoughts.
-          </p>
-        </header>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-12 pb-32">
+      <header className="mb-8 md:mb-12">
+        <h1 className="font-serif text-3xl md:text-5xl font-light text-white mb-4">Aligned Souls</h1>
+        <p className="text-[#e1e3ed]/50 text-xs md:text-sm font-light max-w-lg">
+          Individuals whose emotional wavelength matches yours based on your recent thoughts.
+        </p>
+      </header>
 
         {loading ? (
           <div className="py-20 text-center">
@@ -150,7 +149,6 @@ export function MatchesPage({ onNavigate }: { onNavigate: (page: PageId, params?
             ))}
           </div>
         )}
-      </div>
     </div>
   );
 }

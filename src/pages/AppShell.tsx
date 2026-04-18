@@ -19,6 +19,8 @@ import { ChatPage } from './ChatPage';
 import { ProfilePage } from './ProfilePage';
 import { SettingsPage } from './SettingsPage';
 import { PostDetailPage } from './PostDetailPage';
+import { MobileHeader } from '../components/MobileHeader';
+import { BottomNav } from '../components/BottomNav';
 
 export type PageId = 'home' | 'write' | 'feed' | 'resonance' | 'matches' | 'reflections' | 'chat' | 'profile' | 'settings';
 
@@ -50,10 +52,12 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
       {/* Sidebar background noise */}
       <div className="fixed inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       
-      {/* Sidebar Navigation */}
-      <nav className="relative z-20 w-20 lg:w-64 flex flex-col border-r border-[rgba(255,255,255,0.05)] bg-[#050508]/80 backdrop-blur-xl">
+      <MobileHeader />
+
+      {/* Sidebar Navigation - Hidden on Mobile */}
+      <nav className="relative z-20 w-20 lg:w-64 hidden md:flex flex-col border-r border-[rgba(255,255,255,0.05)] bg-[#050508]/80 backdrop-blur-xl">
         <div className="h-20 flex items-center justify-center lg:justify-start lg:px-8 border-b border-[rgba(255,255,255,0.05)]">
-          <div className="font-serif text-xl tracking-widest text-white">ECHO</div>
+          <div className="font-outfit font-bold text-xl tracking-widest text-white">ECHO</div>
         </div>
 
         <div className="flex-1 overflow-y-auto py-6 px-3 lg:px-4 flex flex-col gap-2">
@@ -105,8 +109,8 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
 
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col relative h-full overflow-hidden">
-        {/* Top Bar */}
-        <header className="h-20 flex-shrink-0 border-b border-[rgba(255,255,255,0.05)] bg-[#050508]/60 backdrop-blur-md px-8 flex items-center justify-between z-20">
+        {/* Top Bar - Hidden on Mobile */}
+        <header className="h-20 flex-shrink-0 border-b border-[rgba(255,255,255,0.05)] bg-[#050508]/60 backdrop-blur-md px-8 hidden md:flex items-center justify-between z-20">
           <div className="flex bg-[#14151a] rounded-full border border-[rgba(255,255,255,0.05)] px-4 py-2 w-full max-w-sm items-center gap-3">
             <Search className="w-4 h-4 text-[#e1e3ed]/40" />
             <input 
@@ -145,7 +149,7 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
         </header>
 
         {/* Page Content */}
-        <div className="flex-1 overflow-y-auto relative scroll-smooth">
+        <div className="flex-1 overflow-y-auto relative scroll-smooth pt-16 md:pt-0 pb-20 md:pb-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={location.pathname}
@@ -172,6 +176,8 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
           </AnimatePresence>
         </div>
       </main>
+
+      <BottomNav />
     </div>
   );
 }

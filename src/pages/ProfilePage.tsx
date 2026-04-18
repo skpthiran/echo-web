@@ -148,8 +148,7 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
-      <div className="w-full max-w-4xl mx-auto px-6 py-12">
+    <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-12 pb-32">
         {/* Profile Header */}
         <div className="flex flex-col items-center justify-center text-center mb-16 relative">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-[#446475] rounded-full mix-blend-screen filter blur-[100px] opacity-[0.15] pointer-events-none" />
@@ -196,8 +195,8 @@ export function ProfilePage() {
                 exit={{ opacity: 0, y: -10 }}
                 className="flex flex-col items-center relative z-10"
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <h1 className="font-serif text-3xl md:text-4xl font-light text-white">
+                <div className="flex flex-col sm:flex-row items-center gap-4 mb-4">
+                  <h1 className="font-serif text-2xl md:text-4xl font-light text-white">
                     {profile?.username || 'Echo User'}
                   </h1>
                   <button 
@@ -208,7 +207,7 @@ export function ProfilePage() {
                   </button>
                 </div>
                 
-                <p className="text-[#e1e3ed]/60 text-lg font-light max-w-lg mb-8 italic">
+                <p className="text-[#e1e3ed]/60 text-sm md:text-lg font-light max-w-lg mb-8 italic px-4">
                   "{profile?.bio || 'Silent observer of the human wavelength.'}"
                 </p>
               </motion.div>
@@ -271,35 +270,34 @@ export function ProfilePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
-             className="flex items-center gap-8 text-center relative z-10 border-t border-[rgba(255,255,255,0.05)] pt-8 w-full justify-center max-w-sm mt-8"
+             className="grid grid-cols-3 gap-4 text-center relative z-10 border-t border-[rgba(255,255,255,0.05)] pt-8 w-full justify-center max-w-sm mt-8"
           >
              <div>
-                <div className="text-[10px] uppercase tracking-widest text-[#e1e3ed]/40 mb-2">Streaks</div>
-                <div className="font-serif text-2xl text-white font-light">{profile?.streak || 0}</div>
+                <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-[#e1e3ed]/40 mb-2">Streaks</div>
+                <div className="font-serif text-xl sm:text-2xl text-white font-light">{profile?.streak || 0}</div>
              </div>
              <div>
-                <div className="text-[10px] uppercase tracking-widest text-[#e1e3ed]/40 mb-2">Reputation</div>
-                <div className="font-serif text-2xl text-white font-light">{profile?.reputation_score || 0}</div>
+                <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-[#e1e3ed]/40 mb-2">Reputation</div>
+                <div className="font-serif text-xl sm:text-2xl text-white font-light">{profile?.reputation_score || 0}</div>
              </div>
              <div>
-                <div className="text-[10px] uppercase tracking-widest text-[#e1e3ed]/40 mb-2">Thoughts</div>
-                <div className="font-serif text-2xl text-white font-light">{totalCount}</div>
+                <div className="text-[9px] sm:text-[10px] uppercase tracking-widest text-[#e1e3ed]/40 mb-2">Thoughts</div>
+                <div className="font-serif text-xl sm:text-2xl text-white font-light">{totalCount}</div>
              </div>
           </motion.div>
         </div>
 
-        {/* Content Tabs */}
-        <div className="my-12 flex justify-center">
-          <div className="inline-flex p-1 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-full">
+        <div className="my-10 md:my-12 flex justify-center">
+          <div className="inline-flex flex-col sm:flex-row p-1 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-2xl sm:rounded-full w-full sm:w-auto">
             <button 
               onClick={() => setActiveTab('my')}
-              className={`px-6 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-all ${activeTab === 'my' ? 'bg-white text-black' : 'text-[#e1e3ed]/40 hover:text-white'}`}
+              className={`px-6 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-[10px] sm:text-xs font-medium uppercase tracking-widest transition-all ${activeTab === 'my' ? 'bg-white text-black' : 'text-[#e1e3ed]/40 hover:text-white'}`}
             >
-              Your Published Thoughts
+              My Thoughts
             </button>
             <button 
               onClick={() => setActiveTab('saved')}
-              className={`px-6 py-2 rounded-full text-xs font-medium uppercase tracking-widest transition-all ${activeTab === 'saved' ? 'bg-white text-black' : 'text-[#e1e3ed]/40 hover:text-white'}`}
+              className={`px-6 py-2.5 sm:py-2 rounded-xl sm:rounded-full text-[10px] sm:text-xs font-medium uppercase tracking-widest transition-all ${activeTab === 'saved' ? 'bg-white text-black' : 'text-[#e1e3ed]/40 hover:text-white'}`}
             >
               Saved Echoes
             </button>
@@ -374,7 +372,6 @@ export function ProfilePage() {
           ) : (
             <p className="text-center text-white/20 italic font-serif py-12">Saved echoes feature coming soon.</p>
           )}
-        </div>
       </div>
     </div>
   );

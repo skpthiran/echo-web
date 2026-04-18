@@ -129,18 +129,18 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
         <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-[radial-gradient(circle,rgba(22,26,58,0.3)_0%,transparent_70%)] rounded-full mix-blend-screen filter blur-[80px]" />
       </div>
 
-      <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto px-6 py-12 lg:py-20 relative z-10">
+      <div className="flex-1 flex flex-col max-w-4xl w-full mx-auto px-4 md:px-6 py-6 md:py-12 lg:py-20 relative z-10">
         
         {/* Header Controls */}
-        <div className="flex items-center justify-between mb-12 opacity-60 hover:opacity-100 transition-opacity duration-500">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8 md:mb-12 opacity-80 sm:opacity-60 sm:hover:opacity-100 transition-opacity duration-500">
           <div className="flex items-center gap-4">
-            <span className="text-xs uppercase tracking-[0.2em] font-medium text-[#e1e3ed]">Drafting...</span>
-            <span className="text-xs font-mono text-[#e1e3ed]/50 flex items-center gap-1.5"><Clock className="w-3 h-3"/> Saved 2m ago</span>
+            <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] font-medium text-[#e1e3ed]">Drafting...</span>
+            <span className="text-[10px] sm:text-xs font-mono text-[#e1e3ed]/50 flex items-center gap-1.5"><Clock className="w-3 h-3"/> Saved 2m ago</span>
           </div>
 
           <button 
             onClick={() => setIsPrivate(!isPrivate)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] transition-colors text-xs uppercase tracking-widest"
+            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.02)] hover:bg-[rgba(255,255,255,0.05)] transition-colors text-[10px] sm:text-xs uppercase tracking-widest w-full sm:w-auto justify-center"
           >
             {isPrivate ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
             {isPrivate ? 'Private Space' : 'Open to Resonance'}
@@ -148,12 +148,12 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
         </div>
 
         {/* Writing Canvas */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col min-h-[30vh]">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="What is lingering in the silence today?"
-            className="w-full flex-1 bg-transparent border-none outline-none resize-none font-serif text-3xl md:text-5xl lg:text-6xl text-white placeholder:text-[#e1e3ed]/20 leading-[1.2] tracking-tight font-light selection:bg-[#8e84ad]/30"
+            className="w-full flex-1 bg-transparent border-none outline-none resize-none font-serif text-2xl md:text-5xl lg:text-6xl text-white placeholder:text-[#e1e3ed]/20 leading-[1.2] tracking-tight font-light selection:bg-[#8e84ad]/30"
             autoFocus
           />
         </div>
@@ -203,16 +203,16 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
           </div>
 
           {/* Submit Actions */}
-          <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
-            <div className="text-xs font-mono text-[#e1e3ed]/30">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 w-full sm:w-auto justify-between sm:justify-end">
+            <div className="text-xs font-mono text-[#e1e3ed]/30 sm:order-first order-last text-right sm:text-left">
               {content.length} / 500
             </div>
             
-            <div className="flex flex-col items-end gap-3">
+            <div className="flex flex-col items-stretch sm:items-end gap-3 order-first sm:order-last">
               <button 
                 onClick={handleSubmit}
                 disabled={content.length === 0 || loading || sharing}
-                className={`group flex items-center justify-center gap-2 px-8 py-4 rounded-full font-medium text-sm transition-all duration-500
+                className={`group flex items-center justify-center gap-2 px-8 py-3.5 sm:py-4 rounded-full font-medium text-sm transition-all duration-500 w-full sm:w-auto
                   ${content.length > 0 && !loading && !sharing
                     ? 'bg-white text-black hover:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.2)]' 
                     : 'bg-[rgba(255,255,255,0.02)] text-[#e1e3ed]/30 cursor-not-allowed border border-[rgba(255,255,255,0.05)]'
@@ -223,11 +223,11 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
               </button>
 
               {content.length >= 30 && user && (
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-col items-stretch sm:items-end gap-2">
                   <HumanGate 
                     fallback={
                       <button
-                        className="flex items-center gap-2 px-6 py-2 rounded-full border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] text-[#e1e3ed]/20 text-[10px] uppercase tracking-widest cursor-default italic"
+                        className="flex items-center gap-2 px-6 py-2 rounded-full border border-[rgba(255,255,255,0.05)] bg-[rgba(255,255,255,0.02)] text-[#e1e3ed]/20 text-[10px] uppercase tracking-widest cursor-default italic w-full justify-center"
                       >
                         Verification Required to Share
                       </button>
@@ -236,7 +236,7 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
                     <button
                       onClick={() => handleShareToFeed()}
                       disabled={sharing || loading}
-                      className={`flex items-center gap-2 px-6 py-2 rounded-full border border-[#8e84ad]/30 bg-transparent hover:bg-[#8e84ad]/5 transition-all duration-300 text-[10px] uppercase tracking-widest text-[#8e84ad] font-bold ${sharing ? 'opacity-50 cursor-wait' : ''}`}
+                      className={`flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#8e84ad]/30 bg-transparent hover:bg-[#8e84ad]/5 transition-all duration-300 text-[10px] uppercase tracking-widest text-[#8e84ad] font-bold w-full justify-center ${sharing ? 'opacity-50 cursor-wait' : ''}`}
                     >
                       <Sparkles className={`w-3.5 h-3.5 ${sharing ? 'animate-spin' : ''}`} />
                       {pipelineStep === 'moderating' ? 'Checking...' : 

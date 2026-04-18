@@ -34,16 +34,16 @@ export function HomeDashboard({ onNavigate }: { onNavigate: (page: PageId) => vo
   }, []);
 
   return (
-    <div className="h-full flex justify-center pb-24">
-      <div className="w-full max-w-5xl px-4 py-8 lg:py-12">
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-12 pb-32">
+      <div className="w-full">
         {/* Welcome Section */}
-        <section className="mb-16">
+        <section className="mb-8 md:mb-16">
           <motion.h2 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className="font-serif text-3xl md:text-5xl font-light text-[#e1e3ed] mb-4"
           >
-            Good evening. <br className="md:hidden" /> <span className="text-[#e1e3ed]/50">The world is quiet here.</span>
+            Good evening. <br className="sm:hidden" /> <span className="text-[#e1e3ed]/50 italic">The world is quiet here.</span>
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0 }}

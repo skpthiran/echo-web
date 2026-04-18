@@ -39,7 +39,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onReactionUpdate, isDe
       {/* Visual background element */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#8e84ad]/5 blur-3xl -mr-16 -mt-16 rounded-full group-hover:bg-[#8e84ad]/10 transition-colors duration-700" />
       
-      <div className="p-6 relative z-10">
+      <div className="p-4 md:p-6 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">

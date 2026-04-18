@@ -57,18 +57,17 @@ export function ResonancePage() {
   }, []);
 
   return (
-    <div className="h-full overflow-y-auto pb-24">
-      <div className="w-full max-w-5xl mx-auto px-6 py-12">
-        <header className="mb-16">
-          <h1 className="font-serif text-4xl md:text-5xl font-light text-white mb-4">Emotional Resonance</h1>
-          <p className="text-[#e1e3ed]/50 uppercase tracking-widest text-xs font-medium">Your connection to the collective.</p>
+    <div className="max-w-5xl mx-auto px-4 md:px-6 py-6 md:py-12 pb-32">
+        <header className="mb-8 md:mb-16">
+          <h1 className="font-serif text-3xl md:text-5xl font-light text-white mb-4">Emotional Resonance</h1>
+          <p className="text-[#e1e3ed]/50 uppercase tracking-widest text-[10px] sm:text-xs font-medium">Your connection to the collective.</p>
         </header>
 
         {/* Hero Score */}
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="relative flex flex-col items-center justify-center p-16 md:p-24 rounded-[40px] mb-8 bg-[#0a0b12] border border-[rgba(255,255,255,0.03)] overflow-hidden"
+          className="relative flex flex-col items-center justify-center p-10 md:p-24 rounded-[32px] md:rounded-[40px] mb-8 bg-[#0a0b12] border border-[rgba(255,255,255,0.03)] overflow-hidden"
         >
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full border border-[rgba(142,132,173,0.1)] opacity-50" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-[rgba(142,132,173,0.05)] opacity-30" />
@@ -77,10 +76,10 @@ export function ResonancePage() {
             <span className="text-xs uppercase tracking-[0.2em] text-[#8e84ad] mb-6 flex items-center gap-2">
               <Activity className="w-4 h-4" /> Global Alignment
             </span>
-            <div className="font-serif text-8xl md:text-[140px] leading-none text-white tracking-tighter mb-4 font-light">
+            <div className="font-serif text-7xl md:text-[140px] leading-none text-white tracking-tighter mb-4 font-light">
               {loading ? '...' : postCount ?? 0}
             </div>
-            <p className="text-[#e1e3ed]/60 max-w-md font-light text-lg">
+            <p className="text-[#e1e3ed]/60 max-w-md font-light text-base md:text-lg">
               {postCount === 0 || postCount === null 
                 ? "The network is quiet. Be the first to share a thought."
                 : "Thoughts shared the same emotional wavelength across the world. You are not alone in this feeling."}
@@ -147,7 +146,6 @@ export function ResonancePage() {
               </p>
             </div>
           </motion.div>
-        </div>
       </div>
     </div>
   );
