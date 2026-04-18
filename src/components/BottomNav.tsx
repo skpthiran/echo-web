@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { Home, PenLine, Rss, Users, User } from 'lucide-react'
+import { Home, Rss, Activity, Sparkles, MessageCircle } from 'lucide-react'
 import { motion } from 'motion/react'
 
 export const BottomNav: React.FC = () => {
@@ -9,10 +9,10 @@ export const BottomNav: React.FC = () => {
 
   const navItems = [
     { icon: Home, label: 'Home', route: '/' },
-    { icon: PenLine, label: 'Write', route: '/write' },
     { icon: Rss, label: 'Feed', route: '/feed' },
-    { icon: Users, label: 'Matches', route: '/matches' },
-    { icon: User, label: 'Profile', route: '/profile' }
+    { icon: Activity, label: 'Resonance', route: '/resonance' },
+    { icon: Sparkles, label: 'Reflections', route: '/reflections' },
+    { icon: MessageCircle, label: 'Chat', route: '/chat' }
   ]
 
   return (

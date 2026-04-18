@@ -1,5 +1,5 @@
 import React from 'react'
-import { Bell, Search } from 'lucide-react'
+import { Bell, Search, PenLine } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -24,12 +24,22 @@ export const MobileHeader: React.FC = () => {
           <Search className="w-5 h-5" />
         </button>
 
+        <button 
+          onClick={() => navigate('/write')}
+          className="p-2 text-white/60 hover:text-white transition-colors"
+        >
+          <PenLine className="w-5 h-5" />
+        </button>
+
         <button className="relative p-2 text-white/60 hover:text-white transition-colors">
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-indigo-500 rounded-full border-2 border-[#0a0a0a]" />
         </button>
         
-        <Link to="/profile" className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center">
+        <button 
+          onClick={() => navigate('/profile')} 
+          className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-white/5 flex items-center justify-center transition-transform hover:scale-110 active:scale-95"
+        >
           {profile?.avatar_url ? (
             <img 
               src={profile.avatar_url} 
@@ -41,7 +51,7 @@ export const MobileHeader: React.FC = () => {
               {profile?.username?.charAt(0).toUpperCase() ?? '?'}
             </div>
           )}
-        </Link>
+        </button>
       </div>
     </header>
   )
