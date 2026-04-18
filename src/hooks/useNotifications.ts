@@ -40,7 +40,7 @@ export function useNotifications() {
         setUnreadCount(safe.filter(n => !n.is_read).length)
 
         channel = supabase
-          .channel('notifications-channel')
+          .channel(`notifications:${user.id}`)
           .on('postgres_changes', {
             event: 'INSERT',
             schema: 'public',

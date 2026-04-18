@@ -83,6 +83,28 @@ export function useReactions(postId: string) {
         await supabase
           .from('reactions')
           .insert({ post_id: postId, user_id: user.id, type })
+
+        // Create notification for resonance
+        if (type === 'resonate') {
+          const { data: postData } = await supabase
+            .from('posts')
+            .select('user_id, owner:users!posts_user_id_fkey(auth_id)')
+            .eq('id', postId)
+            .single()
+
+          const post = postData as any
+          const ownerAuthId = post?.owner?.auth_id
+
+          if (ownerAuthId && ownerAuthId !== user.id) {
+            await supabase.from('notifications').insert({
+              user_id: ownerAuthId,
+              type: 'resonance',
+              message: `Someone resonated with your thought.`,
+              post_id: postId,
+              from_user_id: user.id
+            })
+          }
+        }
       }
       // fetchReactions will be triggered by the realtime subscription
     } catch (error) {

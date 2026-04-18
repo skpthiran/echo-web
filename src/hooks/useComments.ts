@@ -55,20 +55,24 @@ export function useComments(postId: string) {
       if (error) throw error
 
       // Create a notification for the post owner
-      const { data: post } = await supabase
+      const { data: postData } = await supabase
         .from('posts')
-        .select('user_id')
+        .select('user_id, owner:users!posts_user_id_fkey(auth_id)')
         .eq('id', postId)
         .single()
 
-      if (post && post.user_id !== user.id) {
-        await supabase.from('notifications').insert({
-          user_id: post.user_id,
+      const post = postData as any
+      const ownerAuthId = post?.owner?.auth_id
+
+      if (ownerAuthId && ownerAuthId !== user.id) {
+        const { error: notifError } = await supabase.from('notifications').insert({
+          user_id: ownerAuthId,
           type: 'comment',
           message: `Someone resonated with your thought.`,
           post_id: postId,
           from_user_id: user.id
         })
+        if (notifError) console.error('Error creating notification:', notifError)
       }
     } catch (error) {
       console.error('Error adding comment:', error)
