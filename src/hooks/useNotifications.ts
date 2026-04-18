@@ -9,15 +9,27 @@ export function useNotifications() {
   const [loading, setLoading] = useState(true)
 
   const fetchNotifications = useCallback(async () => {
-    if (!user) return
-    const { data } = await supabase
-      .from('notifications')
-      .select('*, from_profile:profiles!from_user_id(username, avatar_url)')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-    
-    setNotifications((data as any) || [])
-    setLoading(false)
+    try {
+      if (!user) {
+        setNotifications([])
+        setLoading(false)
+        return
+      }
+
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*, from_profile:profiles!from_user_id(username, avatar_url)')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+      
+      if (error) throw error
+      setNotifications((data as any) || [])
+    } catch (err) {
+      console.error('Notifications fetch failed:', err)
+      setNotifications([])
+    } finally {
+      setLoading(false)
+    }
   }, [user])
 
   useEffect(() => {
@@ -41,7 +53,7 @@ export function useNotifications() {
     }
   }, [user, fetchNotifications])
 
-  const unreadCount = notifications.filter(n => !n.is_read).length
+  const unreadCount = (notifications || []).filter(n => n && !n.is_read).length
 
   const markRead = async (id: string) => {
     const { error } = await supabase

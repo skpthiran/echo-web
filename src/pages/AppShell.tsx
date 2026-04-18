@@ -161,7 +161,7 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
                 className="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-[rgba(255,255,255,0.05)] transition-colors"
               >
                 <Bell className="w-5 h-5 text-[#e1e3ed]/70" />
-                {unreadCount > 0 && (
+                {(unreadCount ?? 0) > 0 && (
                   <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-purple-600 rounded-full border border-[#050508] shadow-[0_0_10px_rgba(142,132,173,0.5)]" />
                 )}
               </button>

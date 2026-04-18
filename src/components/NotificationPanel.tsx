@@ -12,7 +12,8 @@ interface NotificationPanelProps {
   onClose: () => void;
 }
 
-export function NotificationPanel({ notifications, onMarkRead, onMarkAllRead, onClose }: NotificationPanelProps) {
+export function NotificationPanel({ notifications: rawNotifications, onMarkRead, onMarkAllRead, onClose }: NotificationPanelProps) {
+  const notifications = rawNotifications ?? [];
   const navigate = useNavigate();
   const panelRef = useRef<HTMLDivElement>(null);
 
