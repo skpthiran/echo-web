@@ -26,11 +26,17 @@ export function useComments(postId: string) {
     const channel = supabase
       .channel(`comments:${postId}`)
       .on('postgres_changes', {
-        event: '*', // Listen for INSERT and DELETE
+        event: '*',
         schema: 'public',
         table: 'comments',
         filter: `post_id=eq.${postId}`
-      }, () => fetchComments())
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          fetchComments()
+        } else if (payload.eventType === 'DELETE') {
+          setComments(prev => prev.filter(c => c.id !== payload.old.id))
+        }
+      })
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }

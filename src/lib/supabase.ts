@@ -125,6 +125,8 @@ export interface Database {
           avatar_url?: string | null
           bio?: string | null
           reputation_score?: number
+          onboarding_intent?: string | null
+          onboarding_complete?: boolean
         }
         Update: {
           id?: string
@@ -132,6 +134,8 @@ export interface Database {
           avatar_url?: string | null
           bio?: string | null
           reputation_score?: number
+          onboarding_intent?: string | null
+          onboarding_complete?: boolean
         }
         Relationships: []
       }

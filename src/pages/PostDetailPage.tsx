@@ -8,7 +8,6 @@ import { PostCard } from '../components/PostCard';
 import { CommentItem } from '../components/CommentItem';
 import { useComments } from '../hooks/useComments';
 import { useAuth } from '../context/AuthContext';
-import { HumanGate } from '../components/HumanGate';
 
 export function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>();
@@ -108,31 +107,38 @@ export function PostDetailPage() {
         </div>
 
         {/* Comment Input */}
-        {user && (
-          <div className="mb-12">
-            <HumanGate fallback={<div className="p-8 rounded-2xl bg-[#14151a] border border-dashed border-white/5 text-center text-white/20 text-xs italic">A face scan is required to join the discussion.</div>}>
-              <div className="flex bg-[#14151a] rounded-2xl border border-[rgba(255,255,255,0.05)] p-3 gap-3 focus-within:border-[rgba(142,132,173,0.3)] transition-all">
-                <input
-                  type="text"
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Add to the resonance..."
-                  className="flex-1 bg-transparent border-none outline-none text-sm text-white/80 px-4 placeholder:text-white/20"
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
-                />
+        <div className="mb-12">
+          {user ? (
+            <div className="space-y-4">
+              <textarea 
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="Share your resonance..."
+                rows={3}
+                className="w-full bg-[#111] border border-[#222] rounded-xl p-4 text-white resize-none focus:outline-none focus:border-purple-600 transition-colors placeholder:text-white/20 text-sm"
+              />
+              <div className="flex justify-end">
                 <button
                   onClick={handleAddComment}
                   disabled={submitting || !commentText.trim()}
-                  className="px-4 py-2 bg-[#8e84ad] text-white text-xs font-bold rounded-xl hover:bg-[#a59bc8] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                  className="px-6 py-2.5 bg-[#8e84ad] text-white text-sm font-bold rounded-full hover:bg-[#a59bc8] disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                 >
-                  {submitting ? 'Sending...' : (
-                    <>Send <Send className="w-3 h-3" /></>
-                  )}
+                  {submitting ? 'Posting...' : 'Post Response'}
                 </button>
               </div>
-            </HumanGate>
-          </div>
-        )}
+            </div>
+          ) : (
+            <div className="p-8 rounded-2xl bg-[#14151a] border border-dashed border-white/5 text-center">
+              <p className="text-white/40 text-sm mb-4">Sign in to join the discussion.</p>
+              <button 
+                onClick={() => navigate('/auth')}
+                className="px-6 py-2 bg-white text-black rounded-full font-bold text-xs hover:scale-95 transition-all"
+              >
+                Sign In
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Comments List */}
         <div className="space-y-2">

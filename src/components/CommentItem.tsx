@@ -32,13 +32,18 @@ export const CommentItem: React.FC<CommentItemProps> = ({ comment, replies = [],
     <div className={`group ${isReply ? 'ml-8 mt-4 border-l-2 border-[rgba(142,132,173,0.1)] pl-6' : 'mb-8'}`}>
       <div className="flex gap-4">
         <div className="flex-shrink-0">
-          <div className="w-8 h-8 rounded-full border border-[rgba(255,255,255,0.1)] overflow-hidden bg-gradient-to-br from-[#1a1b23] to-[#0a0a0f]">
+          {comment.profiles.avatar_url ? (
             <img 
-              src={comment.profiles.avatar_url || `https://api.dicebear.com/7.x/shapes/svg?seed=${comment.user_id}`} 
+              src={comment.profiles.avatar_url} 
               alt={comment.profiles.username}
-              className="w-full h-full object-cover"
+              onError={(e) => { e.currentTarget.style.display='none'; }}
+              className="w-8 h-8 rounded-full object-cover border border-white/10"
             />
-          </div>
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs font-bold border border-white/10">
+              {comment.profiles.username?.charAt(0).toUpperCase() ?? '?'}
+            </div>
+          )}
         </div>
         
         <div className="flex-1 min-w-0">
