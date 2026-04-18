@@ -86,23 +86,23 @@ export function useReactions(postId: string) {
 
         // Create notification for resonance
         if (type === 'resonate') {
-          const { data: postData } = await supabase
+          const { data: post } = await supabase
             .from('posts')
             .select('user_id, owner:users!posts_user_id_fkey(auth_id)')
             .eq('id', postId)
             .single()
 
-          const post = postData as any
-          const ownerAuthId = post?.owner?.auth_id
-
-          if (ownerAuthId && ownerAuthId !== user.id) {
-            await supabase.from('notifications').insert({
-              user_id: ownerAuthId,
+          if (post && (post as any).owner?.auth_id && (post as any).owner.auth_id !== user.id) {
+            const { error: notifError } = await supabase.from('notifications').insert({
+              user_id: (post as any).owner.auth_id,
               type: 'resonance',
-              message: `Someone resonated with your thought.`,
+              message: 'Someone resonated with your thought.',
               post_id: postId,
               from_user_id: user.id
             })
+            
+            if (notifError) console.error('Notification failed:', notifError)
+            else console.log('Notification recorded')
           }
         }
       }
