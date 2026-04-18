@@ -44,6 +44,18 @@ export type MessageRow = {
   created_at: string
 }
 
+
+export type NotificationRow = {
+  id: string
+  user_id: string
+  type: 'comment' | 'match' | 'resonance'
+  message: string
+  post_id: string | null
+  from_user_id: string | null
+  is_read: boolean
+  created_at: string
+}
+
 // Entity Types (with joins and aggregations)
 export type Post = PostRow & {
   profiles: { username: string; avatar_url: string | null }
@@ -60,6 +72,10 @@ export type Message = MessageRow & {
 }
 
 export type Reaction = ReactionRow;
+
+export type Notification = NotificationRow & {
+  from_profile?: { username: string; avatar_url: string | null }
+}
 
 export type EmbeddingRow = {
   id: string

@@ -53,6 +53,23 @@ export function useComments(postId: string) {
         parent_id: parentId
       })
       if (error) throw error
+
+      // Create a notification for the post owner
+      const { data: post } = await supabase
+        .from('posts')
+        .select('user_id')
+        .eq('id', postId)
+        .single()
+
+      if (post && post.user_id !== user.id) {
+        await supabase.from('notifications').insert({
+          user_id: post.user_id,
+          type: 'comment',
+          message: `Someone resonated with your thought.`,
+          post_id: postId,
+          from_user_id: user.id
+        })
+      }
     } catch (error) {
       console.error('Error adding comment:', error)
     } finally {

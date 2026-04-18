@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import { PostRow, ReactionRow, CommentRow, Profile, MessageRow, EmbeddingRow } from './types'
+import { PostRow, ReactionRow, CommentRow, Profile, MessageRow, EmbeddingRow, NotificationRow } from './types'
 
 export type Json =
   | string
@@ -201,6 +201,52 @@ export interface Database {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      notifications: {
+        Row: NotificationRow
+        Insert: {
+          id?: string
+          user_id: string
+          type: 'comment' | 'match' | 'resonance'
+          message: string
+          post_id?: string | null
+          from_user_id?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          type?: 'comment' | 'match' | 'resonance'
+          message?: string
+          post_id?: string | null
+          from_user_id?: string | null
+          is_read?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_from_user_id_fkey"
+            columns: ["from_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]
