@@ -29,8 +29,15 @@ export type PageId = 'home' | 'write' | 'feed' | 'resonance' | 'matches' | 'refl
 export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profile } = useProfile();
   const { signOut } = useAuth();
+  const { profile, loading: profileLoading } = useProfile();
+
+  React.useEffect(() => {
+    // Only redirect if profile is loaded, not completed, and we aren't already on onboarding
+    if (!profileLoading && profile && !profile.onboarding_complete && location.pathname !== '/onboarding') {
+      navigate('/onboarding');
+    }
+  }, [profile, profileLoading, navigate, location.pathname]);
 
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
