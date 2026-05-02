@@ -19,6 +19,13 @@ function mulberry32(a: number) {
 }
 
 /**
+ * 32-bit left rotation helper
+ */
+function rotl32(x: number, r: number): number {
+  return ((x << r) | (x >>> (32 - r))) >>> 0;
+}
+
+/**
  * Generates a stable hash num from a string (user_id)
  */
 function cyrb128(str: string): number[] {
@@ -43,7 +50,10 @@ function cyrb128(str: string): number[] {
  */
 export function buildTransformMatrix(seed: string): number[][] {
   const seeds = cyrb128(seed);
-  const rand = mulberry32(seeds[0]);
+  // Combine all 4 outputs of cyrb128 into a stronger 32-bit seed
+  const combined = (seeds[0] ^ rotl32(seeds[1], 7) ^
+                    rotl32(seeds[2], 13) ^ rotl32(seeds[3], 19)) >>> 0;
+  const rand = mulberry32(combined);
   const matrix: number[][] = [];
   
   for (let i = 0; i < 768; i++) {
@@ -78,11 +88,13 @@ export function applySTEER(vector: number[], matrix: number[][]): number[] {
 
 /**
  * Applies STEER and then encrypts the vector using FHE.
+ * Safety guard: ensures FHE is initialized before encryption.
  */
 export async function encryptedSTEERVector(
   vector: number[],
   matrix: number[][]
 ): Promise<string> {
+  await initFHE();
   const transformed = applySTEER(vector, matrix);
   return encryptVector(transformed);
 }

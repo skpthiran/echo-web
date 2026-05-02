@@ -17,7 +17,9 @@ create table posts (
   id uuid primary key default uuid_generate_v4(),
   user_id uuid references profiles(id) on delete cascade,
   content text not null,
-  embedding vector(768),
+  embedding vector(768), -- LEGACY: Raw semantic embedding (do not use for new posts)
+  steered_vector vector(768), -- STEER-transformed vector for matching
+  encrypted_blob text, -- AES-GCM encrypted blob for storage confidentiality
   mood text,
   is_anonymous bool default true,
   created_at timestamptz default now()
@@ -57,7 +59,9 @@ create table embeddings (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references profiles(id) on delete cascade,
   post_id uuid references posts(id) on delete cascade,
-  embedding vector(768),
+  embedding vector(768), -- LEGACY: Raw semantic embedding
+  steered_vector vector(768), -- STEER-transformed vector for matching
+  encrypted_blob text, -- AES-GCM encrypted blob for storage confidentiality
   created_at timestamptz default now()
 );
 
@@ -94,15 +98,24 @@ create policy "Users can send messages" on messages
 create policy "Users can manage their own embeddings" on embeddings
   using (auth.uid() = user_id);
 
+-- Steered vectors readable by service role only (for Cloudflare Workers)
+create policy "Steered vectors readable by service only"
+on embeddings for select
+using (auth.role() = 'service_role');
+
+create policy "Steered vectors in posts readable by service only"
+on posts for select
+using (auth.role() = 'service_role');
+
 -- match_posts function
 create or replace function match_posts(query_embedding vector(768), match_count int, exclude_user_id uuid)
 returns table(id uuid, user_id uuid, content text, mood text, created_at timestamptz, similarity float)
 language sql stable as $$
   select id, user_id, content, mood, created_at,
-    1 - (embedding <=> query_embedding) as similarity
+    1 - (steered_vector <=> query_embedding) as similarity
   from posts
-  where user_id != exclude_user_id and embedding is not null
-  order by embedding <=> query_embedding
+  where user_id != exclude_user_id and steered_vector is not null
+  order by steered_vector <=> query_embedding
   limit match_count;
 $$;
 
@@ -111,11 +124,11 @@ create or replace function match_users(query_embedding vector(768), match_count 
 returns table(user_id uuid, similarity float)
 language sql stable as $$
   select user_id,
-    1 - (avg(embedding) <=> query_embedding) as similarity
+    1 - (avg(steered_vector) <=> query_embedding) as similarity
   from posts
-  where user_id != exclude_user_id and embedding is not null
+  where user_id != exclude_user_id and steered_vector is not null
   group by user_id
-  order by avg(embedding) <=> query_embedding
+  order by avg(steered_vector) <=> query_embedding
   limit match_count;
 $$;
 

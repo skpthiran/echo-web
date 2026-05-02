@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { ai } from '../lib/ai'
-import { buildTransformMatrix } from '../lib/steer'
+import { buildTransformMatrix, applySTEER } from '../lib/steer'
 import { initFHE, encryptVector } from '../lib/fhe'
 
 export interface ResonanceMatch {
@@ -44,37 +44,38 @@ export function useResonance(userId: string | undefined) {
       const rawVector = await ai.embed(combinedText)
       
       // 3. Apply Local STEER Transformation (768D)
+      // This provides semantic anonymization before matching.
       const matrix = buildTransformMatrix(userId)
-      const transformed = new Array(768).fill(0);
-      for (let i = 0; i < 768; i++) {
-        for (let j = 0; j < 768; j++) {
-          transformed[i] += matrix[i][j] * rawVector[j];
-        }
-      }
+      const transformed = applySTEER(rawVector, matrix)
 
-      // Normalize transformed vector
-      const mag = Math.sqrt(transformed.reduce((s, v) => s + v * v, 0));
-      const normalizedTransformed = transformed.map(v => (mag === 0 ? 0 : v / mag));
-
-      // 4. Encrypt with FHE
-      const ciphertext = encryptVector(normalizedTransformed)
+      // 4. Encrypt with AES-GCM for storage confidentiality
+      // This ensures the server cannot read the stored vector without the client-side key.
+      const encryptedBlob = await encryptVector(transformed)
 
       // 5. Upsert to embeddings table
+      // We store the steered_vector for server-side matching and encrypted_blob for local retrieval.
       await supabase
         .from('embeddings')
         .upsert({
           user_id: userId,
-          embedding: normalizedTransformed,
+          steered_vector: transformed,
+          encrypted_blob: encryptedBlob,
           created_at: new Date().toISOString()
         })
 
       // 6. Match via Cloudflare Pages Function
-      // Note: In development, this targets the relative path /functions/resonance-match
-      // or the deployed URL. We'll use the relative path assuming proxying/local-dev.
+      // We send the STEER-transformed vector (plaintext) for server-side similarity computation.
+      // Retrieve session to provide Authorization token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('No active session for resonance match.');
+
       const response = await fetch('/functions/resonance-match', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, encryptedVector: ciphertext })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({ userId, steeredVector: transformed })
       });
 
       if (!response.ok) throw new Error(`Worker match failed: ${response.statusText}`);
