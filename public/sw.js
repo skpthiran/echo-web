@@ -8,6 +8,11 @@ self.addEventListener('install', event => {
 })
 
 self.addEventListener('fetch', event => {
+  // Only handle same-origin requests. Let all cross-origin requests
+  // (fonts, APIs, Supabase, Groq) pass through untouched.
+  const url = new URL(event.request.url)
+  if (url.origin !== self.location.origin) return
+
   event.respondWith(
     caches.match(event.request).then(cached => cached || fetch(event.request))
   )
