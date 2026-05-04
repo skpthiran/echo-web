@@ -149,3 +149,29 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure handle_new_user();
+
+-- Notifications: in-app alerts for reactions, comments, and resonance matches
+create table if not exists notifications (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references profiles(id) on delete cascade,
+  type text not null, -- 'reaction' | 'comment' | 'resonance' | 'system'
+  message text not null,
+  post_id uuid references posts(id) on delete set null,
+  from_user_id uuid references profiles(id) on delete set null,
+  is_read bool default false,
+  created_at timestamptz default now()
+);
+
+alter table notifications enable row level security;
+
+create policy "Users can read own notifications"
+  on notifications for select
+  using (auth.uid() = user_id);
+
+create policy "Users can update own notifications"
+  on notifications for update
+  using (auth.uid() = user_id);
+
+create policy "Service role can insert notifications"
+  on notifications for insert
+  with check (true);
