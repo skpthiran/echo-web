@@ -178,7 +178,9 @@ export interface Database {
           id?: string
           user_id: string
           post_id?: string | null
-          embedding: number[]
+          embedding?: number[]
+          steered_vector?: number[]
+          encrypted_blob?: string
           created_at?: string
         }
         Update: {
@@ -186,6 +188,8 @@ export interface Database {
           user_id?: string
           post_id?: string | null
           embedding?: number[]
+          steered_vector?: number[]
+          encrypted_blob?: string
           created_at?: string
         }
         Relationships: [

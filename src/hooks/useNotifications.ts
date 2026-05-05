@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 
 export interface Notification {
   id: string
@@ -13,6 +14,7 @@ export interface Notification {
 }
 
 export function useNotifications() {
+  const { user } = useAuth()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -22,7 +24,6 @@ export function useNotifications() {
 
     const init = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
         if (!user) return
 
         setLoading(true)
@@ -66,11 +67,10 @@ export function useNotifications() {
     return () => {
       if (channel) supabase.removeChannel(channel)
     }
-  }, [])
+  }, [user])
 
   const markAllRead = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
       await supabase
         .from('notifications')

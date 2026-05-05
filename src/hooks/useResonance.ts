@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../context/AuthContext'
 import { ai } from '../lib/ai'
 import { buildTransformMatrix, applySTEER } from '../lib/steer'
 import { initFHE, encryptVector } from '../lib/fhe'
@@ -12,6 +13,7 @@ export interface ResonanceMatch {
 }
 
 export function useResonance(userId: string | undefined) {
+  const { session } = useAuth()
   const [resonanceMatches, setResonanceMatches] = useState<ResonanceMatch[]>([])
   const [isComputing, setIsComputing] = useState(false)
   const [fheReady, setFheReady] = useState(false)
@@ -66,7 +68,6 @@ export function useResonance(userId: string | undefined) {
       // 6. Match via Cloudflare Pages Function
       // We send the STEER-transformed vector (plaintext) for server-side similarity computation.
       // Retrieve session to provide Authorization token
-      const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('No active session for resonance match.');
 
       const response = await fetch('/functions/resonance-match', {

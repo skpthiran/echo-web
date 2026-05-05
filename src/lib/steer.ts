@@ -1,4 +1,4 @@
-import { encryptVector } from './fhe';
+import { encryptVector, initFHE } from './fhe';
 
 /**
  * STEER (Semantic Transformation for Encrypted Embedding Retrieval)
