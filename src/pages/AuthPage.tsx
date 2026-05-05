@@ -20,7 +20,8 @@ export function AuthPage({ onEnter }: { onEnter: () => void }) {
         setView('check-email')
       } else {
         await signIn(email, password)
-        onEnter()
+        // Do nothing — App.tsx route guard will redirect automatically
+        // once onAuthStateChange fires and sets the user
       }
     } catch (err: any) {
       setError(err.message)
