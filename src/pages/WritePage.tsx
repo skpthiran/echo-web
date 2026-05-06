@@ -20,6 +20,7 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
   const { user } = useAuth();
   const [aiMoodSuggestion, setAiMoodSuggestion] = useState<string | null>(null);
   const [showCrisisModal, setShowCrisisModal] = useState(false);
+  const [crisisSource, setCrisisSource] = useState<'private' | 'feed'>('private');
   const [pipelineStep, setPipelineStep] = useState<'idle' | 'moderating' | 'anonymizing' | 'sharing'>('idle');
   const [pipelineError, setPipelineError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -27,9 +28,22 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
   const moods = ['Quiet', 'Heavy', 'Hopeful', 'Reflective', 'Lost', 'Found'];
 
   const handleSubmit = async () => {
-    if (!content.trim() || loading) return;
-    
+    if (!content.trim() || loading || sharing) return;
+
     try {
+      // Run moderation even for private posts — user safety comes first
+      setPipelineStep('moderating');
+      const moderation = await ai.moderate(content);
+
+      if (moderation === 'distress') {
+        // Show crisis modal; user can still proceed to save privately
+        setCrisisSource('private');
+        setShowCrisisModal(true);
+        setPipelineStep('idle');
+        return;
+      }
+
+      setPipelineStep('idle');
       await createPost(content, mood);
       setSuccessMessage('Your thought has been released.');
       setSuccess(true);
@@ -37,6 +51,7 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Failed to release thought:', err);
+      setPipelineStep('idle');
     }
   };
 
@@ -57,6 +72,7 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
         const moderation = await ai.moderate(content);
 
         if (moderation === 'distress') {
+          setCrisisSource('feed');
           setShowCrisisModal(true);
           setSharing(false);
           setPipelineStep('idle');
@@ -269,7 +285,22 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
         <CrisisModal 
           isOpen={showCrisisModal} 
           onClose={() => setShowCrisisModal(false)}
-          onProceed={() => handleShareToFeed(true)}
+          onProceed={async () => {
+            setShowCrisisModal(false);
+            if (crisisSource === 'private') {
+              try {
+                await createPost(content, mood);
+                setSuccessMessage('Your thought has been released.');
+                setSuccess(true);
+                setContent('');
+                setTimeout(() => setSuccess(false), 3000);
+              } catch (err) {
+                console.error('Failed to save private post after crisis bypass:', err);
+              }
+            } else {
+              handleShareToFeed(true);
+            }
+          }}
         />
 
         {/* Feedback Messages */}
