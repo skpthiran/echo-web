@@ -5,6 +5,8 @@ import { useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Message } from '../lib/types';
+import { useMessageFilter } from '../hooks/useMessageFilter';
+import { MessageWarningBanner } from '../components/MessageWarningBanner';
 
 interface Conversation {
   userId: string;
@@ -25,6 +27,9 @@ export function ChatPage() {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const { checkMessage, dismissWarning, isChecking, verdict, isLocked } =
+    useMessageFilter(user?.id ?? '', activePartnerId ?? '');
 
   // 1. Fetch Conversations
   useEffect(() => {
@@ -125,15 +130,22 @@ export function ChatPage() {
 
   const handleSend = async () => {
     if (!user || !activePartnerId || !newMessage.trim()) return;
+    if (isLocked) return;  // hard gate
 
-    const messageContent = newMessage.trim();
+    const text = newMessage.trim();
+
+    // Run filter BEFORE clearing input or optimistic insert
+    const allowed = await checkMessage(text);
+    if (!allowed) return;   // banner will show; input stays populated
+
+    // Only clear and send if allowed
     setNewMessage('');
 
     const tempMsg: Message = {
       id: Math.random().toString(),
       sender_id: user.id,
       receiver_id: activePartnerId,
-      content: messageContent,
+      content: text,
       created_at: new Date().toISOString()
     };
 
@@ -144,7 +156,7 @@ export function ChatPage() {
       .insert({
         sender_id: user.id,
         receiver_id: activePartnerId,
-        content: messageContent
+        content: text
       });
 
     if (error) {
@@ -240,6 +252,12 @@ export function ChatPage() {
             </div>
 
             <div className="flex-shrink-0 p-6 relative z-10">
+              <MessageWarningBanner 
+                verdict={verdict}
+                isChecking={isChecking}
+                isLocked={isLocked}
+                onDismiss={dismissWarning}
+              />
               <div className="max-w-4xl mx-auto bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-full p-2 flex items-center pr-3 focus-within:border-[rgba(255,255,255,0.15)] focus-within:bg-[rgba(255,255,255,0.03)] transition-colors">
                 <button className="w-10 h-10 flex items-center justify-center text-[#e1e3ed]/30 hover:text-white transition-colors rounded-full">
                   <Image className="w-5 h-5" />
@@ -248,9 +266,10 @@ export function ChatPage() {
                   type="text" 
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                  placeholder="Speak softly..." 
-                  className="flex-1 bg-transparent border-none outline-none text-[#e1e3ed] placeholder:text-[#e1e3ed]/20 px-4 font-light text-sm"
+                  onKeyDown={(e) => e.key === 'Enter' && !isLocked && !isChecking && handleSend()}
+                  placeholder={isLocked ? "Chat locked" : "Speak softly..."}
+                  disabled={isLocked || isChecking}
+                  className="flex-1 bg-transparent border-none outline-none text-[#e1e3ed] placeholder:text-[#e1e3ed]/20 px-4 font-light text-sm disabled:opacity-50"
                 />
                 <button className="w-10 h-10 flex items-center justify-center text-[#e1e3ed]/30 hover:text-white transition-colors rounded-full">
                   <Mic className="w-5 h-5" />
@@ -262,7 +281,8 @@ export function ChatPage() {
                       animate={{ scale: 1, opacity: 1 }}
                       exit={{ scale: 0, opacity: 0 }}
                       onClick={handleSend}
-                      className="w-10 h-10 ml-2 flex items-center justify-center bg-white text-black hover:bg-[#e1e3ed] transition-colors rounded-full"
+                      disabled={isLocked || isChecking}
+                      className="w-10 h-10 ml-2 flex items-center justify-center bg-white text-black hover:bg-[#e1e3ed] transition-colors rounded-full disabled:opacity-50"
                     >
                       <Send className="w-4 h-4 ml-0.5" />
                     </motion.button>
