@@ -42,18 +42,20 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
 
   const handleShareToFeed = async (bypassSafety = false) => {
     if (!content.trim() || content.length < 30 || sharing || !user) return;
-    
+
+    // BUG 3 FIX: close crisis modal immediately when user chooses to proceed
+    if (bypassSafety) setShowCrisisModal(false);
+
     setSharing(true);
     setPipelineError(null);
     let finalContent = content;
 
     try {
-      // 1. Run AI Safety Pipeline
       if (!bypassSafety) {
         // A. Moderation
         setPipelineStep('moderating');
         const moderation = await ai.moderate(content);
-        
+
         if (moderation === 'distress') {
           setShowCrisisModal(true);
           setSharing(false);
@@ -67,16 +69,16 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
           setPipelineStep('idle');
           return;
         }
-
-        // B. Anonymization
-        setPipelineStep('anonymizing');
-        finalContent = await ai.anonymize(content);
       }
 
-      // 2. Publish to Supabase
+      // BUG 4 FIX: always anonymize — even on bypass path — to prevent PII leaks
+      setPipelineStep('anonymizing');
+      finalContent = await ai.anonymize(content);
+
+      // Publish to Supabase
       const finalMood = mood || aiMoodSuggestion || 'Quiet';
-      
-      setPipelineStep('sharing'); 
+
+      setPipelineStep('sharing');
       const { error } = await supabase
         .from('posts')
         .insert({
@@ -91,14 +93,15 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
       setSuccessMessage('Your thought is on the feed');
       setSuccess(true);
       setContent('');
-      
-      // Navigate to feed after a short delay
+
       setTimeout(() => {
         setSuccess(false);
         onNavigate('feed');
       }, 1500);
     } catch (err: any) {
+      // BUG 5 FIX: surface errors to the user instead of swallowing them
       console.error('Failed to share to feed:', err);
+      setPipelineError(err?.message ?? 'Something went wrong. Please try again.');
     } finally {
       setSharing(false);
       setPipelineStep('idle');
