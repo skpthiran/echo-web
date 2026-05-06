@@ -11,40 +11,50 @@ export const ai = {
    * Sanitizes text by removing PII using Groq.
    */
   async anonymize(content: string): Promise<string> {
-    const prompt = `[TASK] Rewrite the following text to remove all Personally Identifiable Information (PII).
-[RULES]
-- Replace full names with realistic generic names (e.g., "Alex", "Jordan").
-- Replace specific addresses with generic ones (e.g., "the park", "my street").
-- Replace phone numbers with dummy ones (e.g., "555-0199").
-- Replace email addresses with generic placeholders (e.g., "someone@example.com").
-- Replace specific dates with generic months or days (e.g., "last Tuesday", "in March").
-- Maintain the emotional tone and original length as closely as possible.
-- OUTPUT THE SANITIZED TEXT ONLY. Absolutely no preamble, label, explanation, or quotes around it.
+    const systemPrompt =
+      'You are a PII-removal engine. You rewrite text to remove all personally ' +
+      'identifiable information. Output ONLY the rewritten text — no preamble, ' +
+      'no labels, no quotes, no explanation.';
 
-[TEXT]
+    const prompt = `Rewrite the following text to remove all Personally Identifiable Information (PII).
+
+RULES:
+- Replace full names with realistic generic names (e.g. "Alex", "Jordan").
+- Replace specific addresses with generic ones (e.g. "the park", "my street").
+- Replace phone numbers with dummy ones (e.g. "555-0199").
+- Replace email addresses with generic placeholders (e.g. "someone@example.com").
+- Replace specific dates with generic references (e.g. "last Tuesday", "in March").
+- Maintain the emotional tone and original length as closely as possible.
+- OUTPUT THE SANITIZED TEXT ONLY.
+
+TEXT:
 ${content}
 
-[SANITIZED TEXT]
-`;
+SANITIZED TEXT:`;
 
     try {
-      let sanitized = await groqGenerate(prompt, 1024);
+      let sanitized = await groqGenerate(prompt, 1024, systemPrompt);
 
-      // Strip any AI preamble the model may have added despite instructions
+      // Strip any residual AI preamble despite instructions
       sanitized = sanitized
         .replace(/^(here is|here's|sanitized text|sanitized|output)[^:]*:\s*/i, '')
-        .replace(/^["']|["']$/g, '') // remove wrapping quotes
+        .replace(/^[\"']|[\"']$/g, '')
         .trim();
 
-      // Fallback: if result is empty OR suspiciously short (< 30% of original), keep original
+      // Hard fail if result is unusable — do NOT silently post raw PII
       if (!sanitized || sanitized.length < content.length * 0.3) {
-        console.warn('Anonymization returned unusable result, using original');
-        return content;
+        throw new Error(
+          'Anonymization produced an unusable result. Please try again.',
+        );
       }
+
       return sanitized;
-    } catch (error) {
+    } catch (error: any) {
+      // Re-throw so the pipeline surfaces this as a visible error
       console.error('AI Anonymization failed:', error);
-      return content;
+      throw new Error(
+        error?.message ?? 'Anonymization failed. Your post was not shared.',
+      );
     }
   },
 
@@ -52,25 +62,39 @@ ${content}
    * Classifies content safety using Groq.
    */
   async moderate(content: string): Promise<'safe' | 'distress' | 'aggression'> {
-    const prompt = `[TASK] Classify the risk level of the text below. Reply with ONLY one word: safe, distress, or aggression. No punctuation. No explanation.
+    const systemPrompt =
+      'You are a strict one-word content safety classifier. ' +
+      'You MUST reply with exactly one word and nothing else: safe, distress, or aggression. ' +
+      'No punctuation. No explanation. No preamble. Just the single word.';
 
-[LABELS]
-- distress: self-harm, suicidal ideation, severe emotional crisis, clinical hopelessness
-- aggression: hate speech, harassment, threats of violence toward others
-- safe: normal expression, shared sadness, frustration, daily struggles
+    const prompt = `Classify the risk level of the text below.
 
-[TEXT]
+LABELS:
+- distress: expressions of self-harm, suicidal ideation, not wanting to exist, 
+  feeling like a burden, severe hopelessness, "I want to disappear", "nobody 
+  would miss me", "I'm so tired of living", "I can't do this anymore", 
+  clinical despair, crisis-level emotional pain
+- aggression: hate speech, slurs, threats of violence toward others, harassment
+- safe: normal sadness, frustration, venting, daily struggles, shared grief
+
+TEXT:
 ${content.slice(0, 1000)}
 
-[LABEL]`;
+REPLY WITH ONE WORD ONLY:`;
 
     try {
-      const response = await groqGenerate(prompt, 20);
-      // Extract only the first word token — handles markdown, punctuation, sentence preambles
-      const cleaned = (response.match(/[a-zA-Z]+/)?.[0] ?? '').toLowerCase();
+      const response = await groqGenerate(prompt, 20, systemPrompt);
 
-      if (cleaned === 'distress') return 'distress';
-      if (cleaned === 'aggression') return 'aggression';
+      // Scan from the END of the response for the first valid label.
+      // This handles any preamble the model may have added despite instructions.
+      const words = response.toLowerCase().match(/[a-z]+/g) ?? [];
+      for (const word of [...words].reverse()) {
+        if (word === 'distress') return 'distress';
+        if (word === 'aggression') return 'aggression';
+        if (word === 'safe') return 'safe';
+      }
+
+      // No recognisable label found — default to safe
       return 'safe';
     } catch (error) {
       console.error('AI Moderation failed:', error);
