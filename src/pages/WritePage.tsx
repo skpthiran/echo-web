@@ -79,13 +79,21 @@ export function WritePage({ onNavigate }: { onNavigate: (page: PageId) => void }
       const finalMood = mood || aiMoodSuggestion || 'Quiet';
 
       setPipelineStep('sharing');
+      let embedding: number[] | undefined;
+      try {
+        embedding = await ai.embed(finalContent);
+      } catch {
+        // Embedding is optional — post without it rather than silently storing zeros
+        console.warn('Embedding skipped: Gemini unavailable');
+      }
+
       const { error } = await supabase
         .from('posts')
         .insert({
           user_id: user.id,
           content: finalContent,
           mood: finalMood,
-          embedding: await ai.embed(finalContent),
+          ...(embedding ? { embedding } : {}),
         });
 
       if (error) throw error;

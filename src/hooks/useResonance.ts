@@ -63,7 +63,7 @@ export function useResonance(userId: string | undefined) {
           steered_vector: transformed,
           encrypted_blob: encryptedBlob,
           created_at: new Date().toISOString()
-        })
+        }, { onConflict: 'user_id' })
 
       // 6. Match via Cloudflare Pages Function
       // We send the STEER-transformed vector (plaintext) for server-side similarity computation.
@@ -109,7 +109,7 @@ export function useResonance(userId: string | undefined) {
     } finally {
       setIsComputing(false)
     }
-  }, [userId, fheReady])
+  }, [userId, fheReady, session])
 
   return { resonanceMatches, isComputing, computeResonance, fheReady }
 }

@@ -236,7 +236,7 @@ export interface Database {
             foreignKeyName: "notifications_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -250,7 +250,7 @@ export interface Database {
             foreignKeyName: "notifications_from_user_id_fkey"
             columns: ["from_user_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]

@@ -57,15 +57,15 @@ export function useComments(postId: string) {
       // Notify post owner
       const { data: post } = await supabase
         .from('posts')
-        .select('user_id, owner:users!posts_user_id_fkey(auth_id)')
+        .select('user_id')
         .eq('id', postId)
         .single()
 
-      if (post && (post as any).owner?.auth_id && (post as any).owner.auth_id !== user.id) {
+      if (post && post.user_id && post.user_id !== user.id) {
         const { error: notifError } = await supabase.from('notifications').insert({
-          user_id: (post as any).owner.auth_id,
+          user_id: post.user_id,
           type: 'comment',
-          message: 'Someone resonated with your thought.',
+          message: 'Someone commented on your thought.',
           post_id: postId,
           from_user_id: user.id
         })

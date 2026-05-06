@@ -26,6 +26,6 @@ export async function geminiEmbed(text: string): Promise<number[]> {
     return embedding;
   } catch (error) {
     console.error('Gemini embedding failed:', error);
-    return new Array(768).fill(0);
+    throw error;
   }
 }

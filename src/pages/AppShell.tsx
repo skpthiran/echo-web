@@ -35,6 +35,7 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
   const { profile, loading: profileLoading } = useProfile();
   const { notifications, unreadCount, markRead, markAllRead } = useNotifications();
   const [showNotifications, setShowNotifications] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   React.useEffect(() => {
     // Only redirect if profile is loaded, not completed, and we aren't already on onboarding
@@ -138,8 +139,12 @@ export function AppShell({ onLogout: ignoredOnLogout }: { onLogout: () => void }
               type="text" 
               placeholder="Search thoughts, feelings, patterns..." 
               className="bg-transparent border-none outline-none text-sm text-[#e1e3ed] placeholder:text-[#e1e3ed]/30 w-full"
+              value={searchQuery}
               onFocus={() => navigate('/search')}
-              onChange={(e) => navigate(`/search?q=${e.target.value}`)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                navigate(`/search?q=${encodeURIComponent(e.target.value)}`);
+              }}
             />
           </div>
 

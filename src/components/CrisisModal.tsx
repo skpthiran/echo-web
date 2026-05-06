@@ -87,7 +87,7 @@ export function CrisisModal({ isOpen, onClose, onProceed }: CrisisModalProps) {
 
                 <div className="mt-8 text-center">
                     <p className="text-[10px] uppercase tracking-[0.2em] text-white/20 italic">
-                        Processing locally. Your words haven't left your device.
+                        Your thought is anonymized by AI before anything is shared.
                     </p>
                 </div>
               </div>

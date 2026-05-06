@@ -88,13 +88,13 @@ export function useReactions(postId: string) {
         if (type === 'resonate') {
           const { data: post } = await supabase
             .from('posts')
-            .select('user_id, owner:users!posts_user_id_fkey(auth_id)')
+            .select('user_id')
             .eq('id', postId)
             .single()
 
-          if (post && (post as any).owner?.auth_id && (post as any).owner.auth_id !== user.id) {
+          if (post && post.user_id && post.user_id !== user.id) {
             const { error: notifError } = await supabase.from('notifications').insert({
-              user_id: (post as any).owner.auth_id,
+              user_id: post.user_id,
               type: 'resonance',
               message: 'Someone resonated with your thought.',
               post_id: postId,

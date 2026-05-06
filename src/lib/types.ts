@@ -82,5 +82,7 @@ export type EmbeddingRow = {
   user_id: string
   post_id: string | null
   embedding: number[]
+  steered_vector?: number[]
+  encrypted_blob?: string
   created_at: string
 }
