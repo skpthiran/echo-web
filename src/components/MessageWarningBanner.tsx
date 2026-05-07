@@ -9,9 +9,10 @@ interface MessageWarningBannerProps {
   isChecking: boolean;
   isLocked: boolean;
   onDismiss: () => void;
+  onDismissAndSend: () => void;
 }
 
-export function MessageWarningBanner({ verdict, isChecking, isLocked, onDismiss }: MessageWarningBannerProps) {
+export function MessageWarningBanner({ verdict, isChecking, isLocked, onDismiss, onDismissAndSend }: MessageWarningBannerProps) {
   const [showCrisis, setShowCrisis] = useState(false);
 
   return (
@@ -78,9 +79,7 @@ export function MessageWarningBanner({ verdict, isChecking, isLocked, onDismiss 
               {verdict.severity === 'distress' ? (
                 <>
                   <button
-                    onClick={() => {
-                      onDismiss();
-                    }}
+                    onClick={onDismissAndSend}
                     className="text-[10px] uppercase tracking-widest text-amber-500/70 hover:text-amber-500 transition-colors"
                   >
                     I'm okay, send anyway
