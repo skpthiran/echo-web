@@ -8,13 +8,13 @@ export type FilterVerdict = {
 };
 
 const HARMFUL_PATTERNS = [
-  /kill you/i,
-  /i will hurt/i,
-  /(?:bitch.*){3,}/i,
-  /your address is/i,
-  /i know where you live/i,
+  /\bkill\s+you\b/i,
+  /\bi\s+will\s+hurt\b/i,
+  /\bbitch\b/i,
+  /\byour\s+address\s+is\b/i,
+  /\bi\s+know\s+where\s+you\s+live\b/i,
   /n[i1]gg[e3]r/i,
-  /f[a@]g/i
+  /\bf[a@]gg?[o0]ts?\b/i,
 ];
 
 export function quickFilter(text: string): boolean {

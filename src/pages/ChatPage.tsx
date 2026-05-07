@@ -28,7 +28,7 @@ export function ChatPage() {
   const [loading, setLoading] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { checkMessage, dismissWarning, isChecking, verdict, isLocked } =
+  const { checkMessage, dismissWarning, dismissAndSend, isChecking, verdict, isLocked } =
     useMessageFilter(user?.id ?? '', activePartnerId ?? '');
 
   // 1. Fetch Conversations
@@ -130,39 +130,36 @@ export function ChatPage() {
 
   const handleSend = async () => {
     if (!user || !activePartnerId || !newMessage.trim()) return;
-    if (isLocked) return;  // hard gate
+    if (isLocked || isChecking) return;
 
     const text = newMessage.trim();
 
-    // Run filter BEFORE clearing input or optimistic insert
-    const allowed = await checkMessage(text);
-    if (!allowed) return;   // banner will show; input stays populated
+    // `doSend` is the actual DB write — extracted so the banner can call it too
+    const doSend = async () => {
+      setNewMessage('');
 
-    // Only clear and send if allowed
-    setNewMessage('');
-
-    const tempMsg: Message = {
-      id: Math.random().toString(),
-      sender_id: user.id,
-      receiver_id: activePartnerId,
-      content: text,
-      created_at: new Date().toISOString()
-    };
-
-    setMessages(prev => [...prev, tempMsg]);
-
-    const { error } = await supabase
-      .from('messages')
-      .insert({
+      const tempMsg: Message = {
+        id: Math.random().toString(),
         sender_id: user.id,
         receiver_id: activePartnerId,
-        content: text
-      });
+        content: text,
+        created_at: new Date().toISOString(),
+      };
+      setMessages((prev) => [...prev, tempMsg]);
 
-    if (error) {
-      console.error('Failed to send message:', error);
-      // Ideally remove temp message or show error
-    }
+      const { error } = await supabase
+        .from('messages')
+        .insert({ sender_id: user.id, receiver_id: activePartnerId, content: text });
+
+      if (error) {
+        console.error('Failed to send message:', error);
+      }
+    };
+
+    const allowed = await checkMessage(text, doSend);
+    if (!allowed) return; // banner shows; if distress, doSend is stored for banner button
+
+    await doSend();
   };
 
   const activePartner = conversations.find(c => c.userId === activePartnerId);
@@ -252,11 +249,12 @@ export function ChatPage() {
             </div>
 
             <div className="flex-shrink-0 p-6 relative z-10">
-              <MessageWarningBanner 
+              <MessageWarningBanner
                 verdict={verdict}
                 isChecking={isChecking}
                 isLocked={isLocked}
                 onDismiss={dismissWarning}
+                onDismissAndSend={dismissAndSend}
               />
               <div className="max-w-4xl mx-auto bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.05)] rounded-full p-2 flex items-center pr-3 focus-within:border-[rgba(255,255,255,0.15)] focus-within:bg-[rgba(255,255,255,0.03)] transition-colors">
                 <button className="w-10 h-10 flex items-center justify-center text-[#e1e3ed]/30 hover:text-white transition-colors rounded-full">
